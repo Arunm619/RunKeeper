@@ -4,6 +4,9 @@ import android.Manifest
 import android.content.Context
 import android.os.Build
 import pub.devrel.easypermissions.EasyPermissions
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.concurrent.TimeUnit
 
 object TrackingUtility {
 
@@ -35,5 +38,23 @@ object TrackingUtility {
 
     fun atleastOreo(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    }
+
+    fun getFormattedStopWatchTime(ms: Long, includeMillis: Boolean = false): String {
+        var milliseconds = ms
+        val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
+        milliseconds -= TimeUnit.HOURS.toMillis(hours)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds)
+        milliseconds -= TimeUnit.MINUTES.toMillis(minutes)
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds)
+        if(!includeMillis){
+            val f: NumberFormat = DecimalFormat("00")
+            return "${f.format(hours)}:${f.format(minutes)}:${f.format(seconds)}"
+        }
+        milliseconds -= TimeUnit.SECONDS.toMillis(seconds)
+        milliseconds /= 10
+
+        val f: NumberFormat = DecimalFormat("00")
+        return "${f.format(hours)}:${f.format(minutes)}:${f.format(seconds)}:${f.format(milliseconds)}"
     }
 }

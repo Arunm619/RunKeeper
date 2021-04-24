@@ -28,8 +28,13 @@ import io.arunbuilds.runkeeper.other.Constants.ACTION_STOP_SERVICE
 import io.arunbuilds.runkeeper.other.Constants.NOTIFICATION_CHANNEL_ID
 import io.arunbuilds.runkeeper.other.Constants.NOTIFICATION_CHANNEL_NAME
 import io.arunbuilds.runkeeper.other.Constants.NOTIFICATION_ID
+import io.arunbuilds.runkeeper.other.Constants.TIMER_UPDATE_INTERVAL
 import io.arunbuilds.runkeeper.other.TrackingUtility
 import io.arunbuilds.runkeeper.ui.MainActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -41,6 +46,8 @@ class TrackingService : LifecycleService() {
 
     private var isFirstRun = true
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+    private val timeRunInSeconds = MutableLiveData<Long>()
 
     override fun onCreate() {
         super.onCreate()
@@ -67,7 +74,7 @@ class TrackingService : LifecycleService() {
                         isFirstRun = false
                     } else {
                         Timber.d("Resumed Service")
-                        startForegroundService()
+                        startTimer()
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
@@ -117,7 +124,6 @@ class TrackingService : LifecycleService() {
     }
 
 
-
     @SuppressLint("MissingPermission")
     private fun updateLocationTracking(isTracking: Boolean) {
         if (isTracking) {
@@ -138,8 +144,9 @@ class TrackingService : LifecycleService() {
         }
     }
 
-    private fun pauseService(){
+    private fun pauseService() {
         isTracking.postValue(false)
+        isTimerEnabled = false
     }
 
 
@@ -147,8 +154,7 @@ class TrackingService : LifecycleService() {
 
         Timber.d("startForegroundService started")
 
-        addEmptyPolyLine()
-
+        startTimer()
         // set as tracking started
         isTracking.postValue(true)
 
@@ -200,6 +206,37 @@ class TrackingService : LifecycleService() {
 
         isTracking.postValue(false)
         pathPoints.postValue(mutableListOf())
+
+        timeRunInMillis.postValue(0L)
+        timeRunInSeconds.postValue(0L)
+    }
+
+
+    private var isTimerEnabled = false
+    private var lapTime = 0L
+    private var timeRun = 0L
+    private var timeStarted = 0L
+    private var lastSecondTimeStamp = 0L
+
+    private fun startTimer() {
+        addEmptyPolyLine()
+        isTracking.postValue(true)
+        timeStarted = System.currentTimeMillis()
+        isTimerEnabled = true
+        CoroutineScope(Dispatchers.Main).launch {
+            while (isTracking.value!!) {
+                // time diff btwn now and time started
+                lapTime = System.currentTimeMillis() - timeStarted
+                //post the new laptime
+                timeRunInMillis.postValue(timeRun + lapTime)
+                if (timeRunInMillis.value!! >= lastSecondTimeStamp + 1000L) {
+                    timeRunInSeconds.postValue(timeRunInSeconds.value!! + 1)
+                    lastSecondTimeStamp += 1000L
+                }
+                delay(TIMER_UPDATE_INTERVAL)
+            }
+            timeRun += lapTime
+        }
     }
 
 
@@ -210,5 +247,8 @@ class TrackingService : LifecycleService() {
 
         //list of poly lines drawing on screen
         val pathPoints = MutableLiveData<Polylines>()
+
+        val timeRunInMillis = MutableLiveData<Long>()
+
     }
 }
