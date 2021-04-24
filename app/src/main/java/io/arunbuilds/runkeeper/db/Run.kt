@@ -6,13 +6,13 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "running_table")
 data class Run(
-    val previewImage: Bitmap? = null,
-    val timeStamp: Long = 0L, // when the run happened (date converted to millis)
-    val averageSpeedInKMPH: Float = 0f,
-    val distanceInMeters: Int = 0,
-    val lengthOfRunTimeInMillis: Long = 0L, // length of run
-    val caloriesBurnt: Int = 0
+    var previewImage: Bitmap? = null,
+    var timeStamp: Long = 0L, // when the run happened (date converted to millis)
+    var averageSpeedInKMPH: Float = 0f,
+    var distanceInMeters: Int = 0,
+    var lengthOfRunTimeInMillis: Long = 0L, // length of run
+    var caloriesBurnt: Int = 0
 ) {
     @PrimaryKey(autoGenerate = true)
-    val id: Int? = null
+    var id: Int? = null
 }
