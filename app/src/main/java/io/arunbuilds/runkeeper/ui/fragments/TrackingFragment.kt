@@ -7,16 +7,17 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import io.arunbuilds.runkeeper.R
-import io.arunbuilds.runkeeper.other.Constants
+import io.arunbuilds.runkeeper.db.Run
 import io.arunbuilds.runkeeper.other.Constants.ACTION_PAUSE_SERVICE
 import io.arunbuilds.runkeeper.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import io.arunbuilds.runkeeper.other.Constants.ACTION_STOP_SERVICE
@@ -28,6 +29,9 @@ import io.arunbuilds.runkeeper.services.Polyline
 import io.arunbuilds.runkeeper.services.TrackingService
 import io.arunbuilds.runkeeper.ui.videmodels.MainViewModel
 import kotlinx.android.synthetic.main.fragment_tracking.*
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.math.round
 
 @AndroidEntryPoint
 class TrackingFragment : Fragment(R.layout.fragment_tracking) {
@@ -40,6 +44,8 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
     private var pathPoints = mutableListOf<Polyline>()
 
     private var menu: Menu? = null
+
+    private var weight = 80f
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,6 +67,11 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
         btnToggleRun.setOnClickListener {
             toggleRun()
+        }
+
+        btnFinishRun.setOnClickListener {
+            zoomToSeeWholeTrack()
+            endRunAndSaveToDb()
         }
 
         subscribeToObservers()
@@ -190,15 +201,16 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        if(currTimeInMillis > 0L){
-            this.menu?.getItem(0 )?.isVisible = true
+        if (currTimeInMillis > 0L) {
+            this.menu?.getItem(0)?.isVisible = true
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.miCancelTracking -> showCancelTrackingDialog()
-            else -> {}
+            else -> {
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -208,18 +220,64 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
             .setTitle("Cancel the run")
             .setMessage("Are you sure to cancel the current run and delete all its data?")
             .setIcon(R.drawable.ic_delete)
-            .setPositiveButton("Yes") { _,_ ->
+            .setPositiveButton("Yes") { _, _ ->
                 stopRun()
             }
             .setNegativeButton("No") { dialog: DialogInterface?, _ ->
                 dialog?.cancel()
             }.create()
 
-            dialog.show()
+        dialog.show()
     }
 
     private fun stopRun() {
         sendCommandtoService(ACTION_STOP_SERVICE)
         findNavController().navigate(R.id.action_trackingFragment_to_runFragment)
+    }
+
+    private fun endRunAndSaveToDb() {
+        map?.snapshot { bmp ->
+            var distanceInMeters = 0
+            for (polyline in pathPoints) {
+                distanceInMeters += TrackingUtility.calculatePolylineLength(polyline).toInt()
+            }
+            val averageSpeed =
+                round((distanceInMeters / 1000f) / (TimeUnit.MILLISECONDS.toHours(currTimeInMillis)) * 10) / 10f
+            val dateTimeStamp = Calendar.getInstance().timeInMillis
+            val caloriesBurnt = ((distanceInMeters / 1000f) * weight).toInt()
+            val run = Run(
+                bmp,
+                dateTimeStamp,
+                averageSpeed,
+                distanceInMeters,
+                currTimeInMillis,
+                caloriesBurnt
+            )
+            viewModel.insertRun(run)
+            Snackbar.make(
+                requireActivity().findViewById(R.id.rootView),
+                "Run saved successfully ",
+                Snackbar.LENGTH_LONG
+            ).show()
+            stopRun()
+        }
+    }
+
+    private fun zoomToSeeWholeTrack() {
+        val bounds = LatLngBounds.Builder()
+        for (polyline in pathPoints) {
+            for (position in polyline) {
+                bounds.include(position)
+            }
+        }
+
+        map?.moveCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                bounds.build(),
+                mapView.width,
+                mapView.height,
+                (mapView.height * 0.05f).toInt()
+            )
+        )
     }
 }
