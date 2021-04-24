@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">RunKeeper</string>
+    <string name="running_app">Run Keeper</string>
+    <string name="sort_by">Sort by:</string>
+    <string name="add_a_new_run">Add a new run</string>
+    <string name="your_name">Your Name</string>
+    <string name="your_weight">Your Weight</string>
+    <string name="apply_changes">Apply Changes</string>
+    <string name="total_distance">Total Distance</string>
+    <string name="_0km">0km</string>
+    <string name="total_time">Total Time</string>
+    <string name="_00_00_00">00:00:00</string>
+    <string name="total_calories_burned">Total Calories Burned</string>
+    <string name="average_speed">Average Speed</string>
+    <string name="_0km_h">0km/h</string>
+    <string-array name="filter_options">
+        <item>Date</item>
+        <item>Running Time</item>
+        <item>Distance</item>
+        <item>Average Speed</item>
+        <item>Calories Burned</item>
+    </string-array>
 </resources>
