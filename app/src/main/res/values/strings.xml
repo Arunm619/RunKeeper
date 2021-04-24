@@ -22,6 +22,11 @@
     <string name="finish_run">Finish Run</string>
     <string name="let_s_go_username">Let\'s go, USERNAME!</string>
     <string name="cancel_run">Cancel Run</string>
+    <string name="date">DATE</string>
+    <string name="time">TIME</string>
+    <string name="distance">DISTANCE</string>
+    <string name="avgspeed">AVGSPEED</string>
+    <string name="calories">CALORIES</string>
     <string-array name="filter_options">
         <item>Date</item>
         <item>Running Time</item>

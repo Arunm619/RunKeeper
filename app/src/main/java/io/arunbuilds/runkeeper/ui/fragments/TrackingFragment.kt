@@ -241,14 +241,14 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
             for (polyline in pathPoints) {
                 distanceInMeters += TrackingUtility.calculatePolylineLength(polyline).toInt()
             }
-            val averageSpeed =
-                round((distanceInMeters / 1000f) / (TimeUnit.MILLISECONDS.toHours(currTimeInMillis)) * 10) / 10f
+
+            val avgSpeed = round((distanceInMeters / 1000f) / (currTimeInMillis / 1000f / 60 / 60) * 10) / 10f
             val dateTimeStamp = Calendar.getInstance().timeInMillis
             val caloriesBurnt = ((distanceInMeters / 1000f) * weight).toInt()
             val run = Run(
                 bmp,
                 dateTimeStamp,
-                averageSpeed,
+                avgSpeed,
                 distanceInMeters,
                 currTimeInMillis,
                 caloriesBurnt
