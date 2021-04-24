@@ -67,10 +67,12 @@ class TrackingService : LifecycleService() {
                         isFirstRun = false
                     } else {
                         Timber.d("Resumed Service")
+                        startForegroundService()
                     }
                 }
                 ACTION_PAUSE_SERVICE -> {
                     Timber.d("Paused Service")
+                    pauseService()
                 }
                 ACTION_STOP_SERVICE -> {
                     Timber.d("Stopped Service")
@@ -98,6 +100,7 @@ class TrackingService : LifecycleService() {
     }
 
     //setting the first line's first point.
+    // after we resume, create a new poly line (empty)
     private fun addEmptyPolyLine() = pathPoints.value?.apply {
         add(mutableListOf())
         pathPoints.postValue(this)
@@ -133,6 +136,10 @@ class TrackingService : LifecycleService() {
         } else {
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         }
+    }
+
+    private fun pauseService(){
+        isTracking.postValue(false)
     }
 
 
