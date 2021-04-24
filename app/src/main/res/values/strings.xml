@@ -17,6 +17,10 @@
     <string name="Continue">Continue</string>
     <string name="kg">kg</string>
     <string name="perms_rationale">You need to accept location permission to use this app</string>
+    <string name="_00_00_00_00">00:00:00:00</string>
+    <string name="start">Start</string>
+    <string name="finish_run">Finish Run</string>
+    <string name="let_s_go_username">Let\'s go, USERNAME!</string>
     <string-array name="filter_options">
         <item>Date</item>
         <item>Running Time</item>
