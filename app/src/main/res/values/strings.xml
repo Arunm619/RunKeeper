@@ -13,6 +13,9 @@
     <string name="total_calories_burned">Total Calories Burned</string>
     <string name="average_speed">Average Speed</string>
     <string name="_0km_h">0km/h</string>
+    <string name="welcome_nplease_enter_your_name_and_weight">Welcome! \n Please enter your name and weight.</string>
+    <string name="Continue">Continue</string>
+    <string name="kg">kg</string>
     <string-array name="filter_options">
         <item>Date</item>
         <item>Running Time</item>
