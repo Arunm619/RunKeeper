@@ -28,11 +28,12 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
         super.onViewCreated(view, savedInstanceState)
 
 
+        val navOptions = NavOptions.Builder()
+            .setPopUpTo(R.id.setupFragment, true)
+            .build()
 
         if (!isFirstAppOpen) {
-            val navOptions = NavOptions.Builder()
-                .setPopUpTo(R.id.setupFragment, true)
-                .build()
+
             findNavController().navigate(
                 R.id.action_setupFragment_to_runFragment,
                 savedInstanceState,
@@ -42,7 +43,11 @@ class SetupFragment : Fragment(R.layout.fragment_setup) {
         tvContinue.setOnClickListener {
             val success = writePersonalDataToSharedPref()
             if (success)
-                findNavController().navigate(R.id.action_setupFragment_to_runFragment)
+                findNavController().navigate(
+                    R.id.action_setupFragment_to_runFragment,
+                    savedInstanceState,
+                    navOptions
+                )
             else {
                 Snackbar.make(
                     requireActivity().findViewById(R.id.rootView),
