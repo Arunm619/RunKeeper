@@ -27,4 +27,6 @@ class MainRepository @Inject constructor(
 
     fun getTotalRunTimeInMillis() = runDAO.getTotalRunTimeInMillis()
 
+    fun getAvgSpeed() = runDAO.getAverageSpeedinKMPH()
+
 }
