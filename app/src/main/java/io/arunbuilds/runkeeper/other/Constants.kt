@@ -20,5 +20,9 @@ object Constants {
 
     const val NOTIFICATION_ID = 123
 
+    const val LOCATION_UPDATE_INTERVAL = 5 * 1000
+
+    const val LOCATION_FASTEST_UPDATE_INTERVAL = 2 * 1000
+
 
 }

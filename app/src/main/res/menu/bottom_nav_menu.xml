@@ -5,7 +5,7 @@
         android:icon="@drawable/ic_run"/>
 
     <item android:id="@+id/statisticsFragment"
-        android:title="Your Runs"
+        android:title="Stats"
         android:icon="@drawable/ic_graph"/>
 
     <item android:id="@+id/settingsFragment"

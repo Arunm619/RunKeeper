@@ -32,4 +32,8 @@ object TrackingUtility {
         }
 
     fun isLessThanQ() = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q
+
+    fun atleastOreo(): Boolean {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    }
 }
