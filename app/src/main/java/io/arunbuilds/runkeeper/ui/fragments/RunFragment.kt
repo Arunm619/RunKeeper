@@ -1,5 +1,6 @@
 package io.arunbuilds.runkeeper.ui.fragments
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
@@ -12,16 +13,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import io.arunbuilds.runkeeper.R
 import io.arunbuilds.runkeeper.adapters.RunAdapter
+import io.arunbuilds.runkeeper.other.Constants
 import io.arunbuilds.runkeeper.other.Constants.REQUEST_CODE_LOCATION_PERMISSION
 import io.arunbuilds.runkeeper.other.SortType
 import io.arunbuilds.runkeeper.other.TrackingUtility
 import io.arunbuilds.runkeeper.other.TrackingUtility.ANDROID_Q_PERMS
 import io.arunbuilds.runkeeper.other.TrackingUtility.LOCATION_PERMS
 import io.arunbuilds.runkeeper.ui.videmodels.MainViewModel
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_run.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RunFragment : Fragment(R.layout.fragment_run), EasyPermissions.PermissionCallbacks {

@@ -2,6 +2,7 @@ package io.arunbuilds.runkeeper.ui.fragments
 
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -18,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import io.arunbuilds.runkeeper.R
 import io.arunbuilds.runkeeper.db.Run
+import io.arunbuilds.runkeeper.other.Constants
 import io.arunbuilds.runkeeper.other.Constants.ACTION_PAUSE_SERVICE
 import io.arunbuilds.runkeeper.other.Constants.ACTION_START_OR_RESUME_SERVICE
 import io.arunbuilds.runkeeper.other.Constants.ACTION_STOP_SERVICE
@@ -30,7 +32,7 @@ import io.arunbuilds.runkeeper.services.TrackingService
 import io.arunbuilds.runkeeper.ui.videmodels.MainViewModel
 import kotlinx.android.synthetic.main.fragment_tracking.*
 import java.util.*
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 import kotlin.math.round
 
 @AndroidEntryPoint
@@ -45,7 +47,13 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
 
     private var menu: Menu? = null
 
-    private var weight = 80f
+
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
+    val weight by lazy {
+        sharedPreferences.getFloat(Constants.KEY_WEIGHT, 80f)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -242,7 +250,8 @@ class TrackingFragment : Fragment(R.layout.fragment_tracking) {
                 distanceInMeters += TrackingUtility.calculatePolylineLength(polyline).toInt()
             }
 
-            val avgSpeed = round((distanceInMeters / 1000f) / (currTimeInMillis / 1000f / 60 / 60) * 10) / 10f
+            val avgSpeed =
+                round((distanceInMeters / 1000f) / (currTimeInMillis / 1000f / 60 / 60) * 10) / 10f
             val dateTimeStamp = Calendar.getInstance().timeInMillis
             val caloriesBurnt = ((distanceInMeters / 1000f) * weight).toInt()
             val run = Run(
